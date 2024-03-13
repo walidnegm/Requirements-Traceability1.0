@@ -1,0 +1,259 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+import textwrap
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines  # Add this line
+import networkx as nx
+import textwrap
+
+
+def wrap_text(text, width=40):
+    """Wrap text for better readability in graph visualization."""
+    return '\n'.join(textwrap.wrap(text, width=width))
+
+class Requirement:
+    def __init__(self, id, description):
+        self.id = id
+        self.description = "Requirement: " + description
+
+class TestCase:
+    def __init__(self, id, description):
+        self.id = id
+        self.description = "Test Case: " + description
+        self.requirement = None
+    
+    def link_requirement(self, requirement):
+        self.requirement = requirement
+
+class FunctionOrMethod:
+    def __init__(self, name, complexity=None, description=""):
+        self.name = name
+        self.complexity = complexity
+        self.description = f"Function: {name}\nComplexity: {complexity}\n{description}"
+
+class SoftwareComponent:
+    def __init__(self, id, description):
+        self.id = id
+        self.description = "Software: " + description
+
+class Camera:
+    def __init__(self, id, description):
+        self.id = id
+        self.description = "Camera: " + description
+
+class Sensor:
+    def __init__(self, id, description):
+        self.id = id
+        self.description = "Sensor: " + description
+
+class AlertSystem:
+    def __init__(self, id, description):
+        self.id = id
+        self.description = "Alert System: " + description
+
+# Step #1: Instantiate classes with requirements and corresponding test cases # JAMA / DOORS stores all requirements, there is tracesability from JAMA
+# to JIRA to get test cases mapped to that
+
+requirements = [
+    Requirement("REQ-001", "System shall detect driver drowsiness."),
+    Requirement("REQ-002", "System shall alert the driver when a sudden movement is detected."),
+    Requirement("REQ-003", "Monitor vehicle speed."),
+    Requirement("REQ-004", "Detect mobile device usage."),
+    Requirement("REQ-005", "Monitor eye movement for sleep signs."),
+    Requirement("REQ-006", "System shall provide real-time traffic updates."),
+    Requirement("REQ-007", "System shall offer voice control capabilities."),
+    Requirement("REQ-008", "Hardware compute platform that is highly reliable."),
+    Requirement("REQ-009", "High bandwidth communication across a single PCB."),
+    Requirement("REQ-010", "Compute element with 4 CAN, 2 LIN, and Ethernet interfaces. Power input of 2Kw and 500W for the module level."),
+    Requirement("REQ-011", "Integration of a gateway SoC."),
+    Requirement("REQ-012", "Safety classification of ASIL-D."),
+    Requirement("REQ-013", "Achievement of a functional safety goal requirement XYZ."),
+    Requirement("REQ-014", "Requirement for GNSS."),
+    Requirement("REQ-015", "Needs to be EMC compliant."),
+]
+
+
+## Step #2: Then get requiremnts and put the block diagram -- CAMEO, UML diagrams---like an activity, using SysML and modeling---and once they have done all the 
+# architecture they port to XML file---and into code. Restrcted to OEM--typically done itnernally... 
+
+# https://www.omg.org/pdf/SysML-v2-Overview.pdf
+
+for i in range(min(len(requirements), len(test_cases))):
+    test_cases[i].link_requirement(requirements[i])
+
+
+# System components and functions
+camera1 = Camera("CAM-001", "Front facing for facial landmarks.")
+sensor1 = Sensor("SENS-001", "Accelerometer for sudden movements.")
+alert_system1 = AlertSystem("ALERT-001", "Generates alerts.")
+
+software_components = [
+    SoftwareComponent("SW-001", "Drowsiness Detection Algorithm"),
+    SoftwareComponent("SW-002", "Alert Management System"),
+]
+
+
+
+## Step #3: Then get requiremnts and put storyboards in JIRA software that is detect drowins becames a backlog for the algorithm
+
+functions = [
+    FunctionOrMethod("detect_drowsiness", 5, "Based on eye aspect ratio."),
+    FunctionOrMethod("monitor_vehicle_movement", 3, "Detects sudden changes."),
+    FunctionOrMethod("generate_alert", 2, "Based on detection level."),
+    FunctionOrMethod("detect_mobile_use", 4, "Detects mobile device usage."),
+    FunctionOrMethod("monitor_eye_movement", 4, "Looks for sleep signs."),
+]
+
+##When the SW guys assumes there is a GPU--but there requiremtn for GPU--and there were hardware for example, 
+
+
+# Test cases are defined in JIRA ---the performance sub par---and scratching---you mave submnit a nre quiremnte JAMA or tracealyt that allows made at
+# systems level 
+test_cases = [
+    TestCase("TC-001", "Verify drowsiness detection."),
+    TestCase("TC-002", "Verify alert on movement."),
+    TestCase("TC-003", "Verify speed monitoring."),
+    TestCase("TC-004", "Verify mobile device detection."),
+    TestCase("TC-005", "Verify sleep sign detection."),
+    TestCase("TC-006", "Verify traffic update functionality."),
+    TestCase("TC-007", "Verify voice control functionality."),
+    TestCase("TC-008", "Verify the system provides real-time traffic updates."),
+    TestCase("TC-009", "Verify the system offers voice control capabilities."),
+  
+]
+# Visualization setup
+G = nx.DiGraph()
+color_map = []
+
+color_scheme = {
+    'Requirement': 'red',
+    'Test Case': 'blue',
+    'Function': 'green',
+    'Software Component': 'purple',
+    'Hardware Component': 'orange',
+}
+
+# Function to add nodes and assign colors
+def add_node_with_color(node_id, description, node_type):
+    G.add_node(node_id, description=description)
+    if node_type == 'requirement':
+        color_map.append('red')
+    elif node_type == 'test_case':
+        color_map.append('blue')
+    elif node_type == 'function':
+        color_map.append('green')
+    elif node_type == 'software_component':
+        color_map.append('purple')
+    elif node_type == 'hardware_component':
+        color_map.append('orange')
+
+# Add nodes with their types
+for req in requirements:
+    add_node_with_color(req.id, req.description, 'requirement')
+
+for tc in test_cases:
+    add_node_with_color(tc.id, tc.description, 'test_case')
+
+
+
+
+for func in functions:
+    add_node_with_color(func.name, func.description, 'function')
+
+for sw in software_components:
+    add_node_with_color(sw.id, sw.description, 'software_component')
+
+# Hardware components are treated individually
+add_node_with_color(camera1.id, camera1.description, 'hardware_component')
+add_node_with_color(sensor1.id, sensor1.description, 'hardware_component')
+add_node_with_color(alert_system1.id, alert_system1.description, 'hardware_component')
+
+
+# Add edges
+for tc in test_cases:
+    if tc.requirement is not None:  # Check if the test case has a linked requirement
+        G.add_edge(tc.requirement.id, tc.id, label="verifies")
+    else:
+        print(f"Warning: Test case {tc.id} does not have a linked requirement.")
+
+for func in functions:
+    G.add_edge(func.name, alert_system1.id, label="triggers")
+for sw in software_components:
+    for func in functions:
+        G.add_edge(sw.id, func.name, label="implements")
+    for tc in test_cases:
+        G.add_edge(tc.id, sw.id, label="tests")
+
+for sw in software_components:
+    G.add_edge(sw.id, camera1.id, label="utilizes")
+    G.add_edge(sw.id, sensor1.id, label="utilizes")
+    G.add_edge(sw.id, alert_system1.id, label="utilizes")
+
+# If there are specific functions that are directly related to hardware components, add those connections as well
+for func in functions:
+    if "detect_drowsiness" in func.name or "monitor_vehicle_movement" in func.name:
+        G.add_edge(func.name, camera1.id, label="uses")
+    if "generate_alert" in func.name:
+        G.add_edge(func.name, alert_system1.id, label="triggers")
+        
+# Draw the graph
+# Adjust the spring layout parameters to spread nodes but use reasonable values
+pos = nx.spring_layout(G, k=0.5, iterations=50)  # Adjust 'k' and 'iterations' as needed
+
+# Draw the graph with adjusted parameters
+plt.figure(figsize=(12, 12))  # Adjust figure size as needed
+nx.draw(G, pos, with_labels=False, node_size=100, node_color=color_map, edge_color="gray", alpha=0.7)
+labels = {node: data['description'] for node, data in G.nodes(data=True)}
+nx.draw_networkx_labels(G, pos, labels=labels, font_size=8)
+
+# Create and place legend more efficiently
+legend_handles = [mlines.Line2D([], [], color=color, marker='o', linestyle='None',
+                                markersize=10, label=label) for label, color in color_scheme.items()]
+plt.legend(handles=legend_handles, loc='upper right', bbox_to_anchor=(1.05, 1))
+
+plt.axis('off')
+plt.tight_layout()  # Try to improve utilization of space
+plt.show()
+
+#####SYSML https://blog.visual-paradigm.com/beginners-guide-to-sysml-internal-block-diagrams/
+
+req_widgets = []
+for req in requirements:  # requirements is a list
+    func_widgets = []
+
+    # Direct linkage between requirements and functions is not provided.
+    # For now, let's consider all functions for demonstration purposes.
+    # You'll need to establish a logical connection based on your application's logic.
+    related_functions = functions  # This assumes all functions might relate to any requirement, which you'll need to adjust.
+
+    for func in related_functions:
+        software_widgets = []
+        
+        # Here, instead of assuming direct relations, you would filter or find related software components based on your logic.
+        # For demonstration, let's consider all software components.
+        related_software = software_components
+
+        for sw in related_software:
+            # Assuming direct relations or identifying logic for hardware components
+            related_hardware = [camera1, sensor1, alert_system1]  # Placeholder for actual logic
+
+            hardware_widgets = [widgets.Label(hw.description) for hw in related_hardware]
+            sw_accordion = widgets.Accordion(children=[widgets.VBox(hardware_widgets)], selected_index=None)
+            sw_accordion.set_title(0, sw.description)
+            software_widgets.append(sw_accordion)
+
+        # Assuming test cases related to functions are tracked or can be deduced
+        related_test_cases = test_cases  # Placeholder for actual logic
+        
+        test_case_widgets = [widgets.Label(tc.description) for tc in related_test_cases]
+        all_widgets_under_func = test_case_widgets + software_widgets
+        func_accordion = widgets.Accordion(children=[widgets.VBox(all_widgets_under_func)], selected_index=None)
+        func_accordion.set_title(0, func.description)
+        func_widgets.append(func_accordion)
+        
+    req_accordion = widgets.Accordion(children=[widgets.VBox(func_widgets)], selected_index=None)
+    req_accordion.set_title(0, req.description)
+    req_widgets.append(req_accordion)
+
+display(widgets.VBox(req_widgets))
