@@ -1,0 +1,84 @@
+import subprocess
+import pandas as pd
+import json
+
+# Define the path to your code file
+code_file_path = 'DistractedDriverCode.txt'
+print (code_file_path)
+# Run Radon Cyclomatic Complexity (CC) Analysis
+cc_result = subprocess.run(['radon', 'cc', code_file_path, '-s', '-j'], stdout=subprocess.PIPE)
+cc_metrics = json.loads(cc_result.stdout.decode('utf-8'))
+
+# Run Radon Maintainability Index (MI) Analysis
+mi_result = subprocess.run(['radon', 'mi', code_file_path, '-j'], stdout=subprocess.PIPE)
+mi_metrics = json.loads(mi_result.stdout.decode('utf-8'))
+
+# Run Radon Raw Metrics Analysis
+raw_result = subprocess.run(['radon', 'raw', code_file_path, '-j'], stdout=subprocess.PIPE)
+raw_metrics = json.loads(raw_result.stdout.decode('utf-8'))
+
+# Extracting and preparing data for the table
+# Correcting the comprehension for CC data
+cc_data = [{'Function Name': func['name'], 'Cyclomatic Complexity': func['complexity']} for func in cc_metrics[code_file_path]]
+mi_data = {'Maintainability Index': mi_metrics[code_file_path]['mi']}
+raw_data = raw_metrics[code_file_path]
+
+# Creating DataFrames
+cc_df = pd.DataFrame(cc_data)
+mi_df = pd.DataFrame([mi_data])
+raw_df = pd.DataFrame([raw_data])
+
+# Displaying the tables
+print("Cyclomatic Complexity (CC):")
+print(cc_df)
+print("\nMaintainability Index (MI):")
+print(mi_df)
+print("\nRaw Metrics:")
+print(raw_df)
+
+
+import matplotlib.pyplot as plt
+
+# Ensure you have matplotlib installed
+# pip install matplotlib
+
+# For Cyclomatic Complexity (CC)
+def plot_cc(cc_data):
+    function_names = [d['Function Name'] for d in cc_data]
+    complexities = [d['Cyclomatic Complexity'] for d in cc_data]
+    
+    plt.figure(figsize=(10, 8))
+    plt.barh(function_names, complexities, color='skyblue')
+    plt.xlabel('Cyclomatic Complexity')
+    plt.title('Cyclomatic Complexity per Function')
+    plt.tight_layout()
+    plt.show()
+
+# For Maintainability Index (MI)
+def plot_mi(mi_metrics):
+    mi_values = [mi_metrics[file]['mi'] for file in mi_metrics]
+    files = list(mi_metrics.keys())
+    
+    plt.figure(figsize=(10, 3))
+    plt.barh(files, mi_values, color='lightgreen')
+    plt.xlabel('Maintainability Index')
+    plt.title('Maintainability Index per File')
+    plt.tight_layout()
+    plt.show()
+
+# For Raw Metrics (showing LOC as an example)
+def plot_raw(raw_metrics):
+    loc_values = [raw_metrics[file]['loc'] for file in raw_metrics]
+    files = list(raw_metrics.keys())
+    
+    plt.figure(figsize=(10, 3))
+    plt.barh(files, loc_values, color='salmon')
+    plt.xlabel('Lines of Code (LOC)')
+    plt.title('Lines of Code (LOC) per File')
+    plt.tight_layout()
+    plt.show()
+
+# Call the plotting functions
+plot_cc(cc_data)
+plot_mi(mi_metrics)
+plot_raw(raw_metrics)
